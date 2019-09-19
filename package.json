@@ -1,0 +1,27 @@
+{
+  "name": "qanda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sdcmongoschema.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sdccheetah/qanda.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sdccheetah/qanda/issues"
+  },
+  "homepage": "https://github.com/sdccheetah/qanda#readme",
+  "devDependencies": {
+    "mongoose": "^5.7.1"
+  },
+  "dependencies": {
+    "csv-parse": "^4.4.6",
+    "csv-parser": "^2.3.0",
+    "fast-csv": "^3.4.0"
+  }
+}
