@@ -12,8 +12,8 @@ var db = mongoose.connection;
 var Schema = mongoose.Schema;
 
 var questionSchema = new Schema({
-  id: Number,
-  product_id: Number,
+  id: { type: Number, unique: true },
+  product_id: { type: Number, index: true },
   body: String,
   date_written: Date,
   asker_name: String,
@@ -28,6 +28,7 @@ db.once("open", function(callback) {
   console.log("Connection succeeded.");
   let results = [];
   let count = 0;
+  let insert = 0;
   var lineReader = fs
     .createReadStream("../questions.csv")
     .pipe(csv())
@@ -47,7 +48,8 @@ db.once("open", function(callback) {
         Question.insertMany(results);
         count = 0;
         results = [];
-        console.log("1000 questions inserted");
+        insert++;
+        console.log(insert);
       }
     })
     .on("end", () => {
