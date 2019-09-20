@@ -53,6 +53,7 @@ db.once("open", function(callback) {
       }
     })
     .on("end", () => {
+      Question.insertMany(results);
       console.log("questions inserted");
     });
 });
