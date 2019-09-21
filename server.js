@@ -17,24 +17,30 @@ MongoClient.connect("mongodb://localhost:27017/questions", function(
 
   app.get("/qa/:product_id", (req, res) => {
     console.log(req.params);
+
+    // should the promises be nested or one after another,
+    // pushing results array into the data returned by the previous?
     db.collection("questions")
       .find({ product_id: Number(req.params.product_id) })
       .forEach(question => {
+        console.log("QUESTION DATA: ", question);
         db.collection("answers")
           .find({ question_id: Number(question.id) })
           .forEach(answer => {
             db.collection("photos")
-              .find({ answer_id: answer.id })
+              .find({ answer_id: answer.id }, { url: 1, _id: 0 })
               .toArray((err, result) => {
                 if (err) throw err;
                 answer["photos"] = result;
-                delete answer["photos"]._id;
-                delete answer["photos"].answer_id;
                 console.log(answer);
               });
+          })
+          .toArray((err, result) => {
+            if (err) throw err;
+            question["answers"] = result;
           });
       });
-    res.sendStatus(200);
+
     // .toArray(function(err, result) {
     //   if (err) throw err;
     //   console.log(result);
