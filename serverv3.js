@@ -50,11 +50,43 @@ MongoClient.connect(
               });
           });
           Promise.all(promises).then(() => {
-            console.log("returnObj", returnObj);
             res.send(cleanUpData(returnObj));
           });
         })
         .catch(err => console.log(err));
+    });
+
+    app.get("/qa/:question_id/answers", (req, res) => {
+      let page = req.params.page || 0;
+      let count = req.params.count || 5;
+      let question_id = req.params.question_id;
+      let returnObj = {};
+      returnObj["question_id"] = question_id;
+      db.collection("answers")
+        .find({ question_id: Number(question_id) })
+        .limit(count)
+        .skip(page * count)
+        .toArray()
+        .then(answers => {
+          returnObj["answers"] = answers;
+          innerPromises = answers.map(answer => {
+            return db
+              .collection("photos")
+              .find({ answer_id: answer.id })
+              .toArray()
+              .then(photos => {
+                answer["photos"] = photos;
+              })
+              .catch(err => console.log(err));
+          });
+          return Promise.all(innerPromises);
+        })
+        .then(data => {
+          res.send(returnObj);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     });
   }
 );
