@@ -2,35 +2,16 @@ var mongoose = require("mongoose");
 const fs = require("fs");
 const readline = require("readline");
 const csv = require("csv-parser");
+const model = require("../model.js");
 
-mongoose.connect("mongodb://localhost:27017/questions2", {
-  useNewUrlParser: true
-});
-
-var db = mongoose.connection;
-
-var Schema = mongoose.Schema;
-
-var questionSchema = new Schema({
-  question_id: { type: Number, unique: true },
-  product_id: { type: Number, index: true },
-  question_body: String,
-  question_date: Date,
-  asker_name: String,
-  asker_email: String,
-  reported: Number,
-  question_helpfulness: Number
-});
-
-var Question = mongoose.model("Question", questionSchema);
-db.on("error", console.error.bind(console, "connection error"));
-db.once("open", function(callback) {
+model.db.on("error", console.error.bind(console, "connection error"));
+model.db.once("open", function(callback) {
   console.log("Connection succeeded.");
   let results = [];
   let count = 0;
   let insert = 0;
   var lineReader = fs
-    .createReadStream("../questions.csv")
+    .createReadStream("../../questions.csv")
     .pipe(csv())
     .on("data", data => {
       results.push({
@@ -45,7 +26,7 @@ db.once("open", function(callback) {
       });
       count++;
       if (count === 10000) {
-        Question.insertMany(results);
+        model.Question.insertMany(results);
         count = 0;
         results = [];
         insert++;
@@ -53,7 +34,7 @@ db.once("open", function(callback) {
       }
     })
     .on("end", () => {
-      Question.insertMany(results);
+      if (results.length > 0) model.Question.insertMany(results);
       console.log("questions inserted");
     });
 });

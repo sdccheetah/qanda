@@ -2,42 +2,63 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
+const model = require("./model.js");
 
 app.use(bodyParser.json());
 
-var MongoClient = require("mongodb").MongoClient;
+const MongoClient = require("mongodb").MongoClient;
 
 MongoClient.connect(
-  "mongodb://localhost:27017/questions",
+  "mongodb://localhost:27017/questions2",
   { useNewUrlParser: true, useUnifiedTopology: true },
   function(err, client) {
     if (err) throw err;
 
-    var db = client.db("questions");
+    const db = client.db("questions2");
 
     app.get("/qa/:product_id", (req, res) => {
       let returnObj = {};
       returnObj["product_id"] = req.params.product_id;
       db.collection("questions")
         .find({ product_id: Number(req.params.product_id) })
+        .project({
+          _id: 0,
+          question_id: 1,
+          question_body: 1,
+          question_date: 1,
+          asker_name: 1,
+          question_helpfulness: 1,
+          reported: 1
+        })
         .toArray()
         .then(questions => {
           returnObj["results"] = questions;
+          console.log(returnObj);
           let innerPromises;
           let promises = returnObj["results"].map(question => {
+            let questionId = Number(question.question_id);
             return db
               .collection("answers")
-              .find({ question_id: question.id })
+              .find({ question_id: questionId })
+              .project({
+                _id: 0,
+                id: 1,
+                body: 1,
+                date: 1,
+                answerer_name: 1,
+                helpfulness: 1
+              })
               .toArray()
               .then(answers => {
-                question["answers"] = answers;
+                question["answers"] = {};
                 innerPromises = answers.map(answer => {
                   return db
                     .collection("photos")
                     .find({ answer_id: answer.id })
                     .toArray()
                     .then(photos => {
-                      answer["photos"] = photos;
+                      question["answers"][answer.id] = answer;
+                      question["answers"][answer.id].photos = photos;
                     })
                     .catch(err => console.log(err));
                 });
@@ -48,7 +69,7 @@ MongoClient.connect(
               });
           });
           Promise.all(promises).then(() => {
-            res.send(cleanUpData(returnObj));
+            res.send(returnObj);
           });
         })
         .catch(err => console.log(err));
