@@ -16,8 +16,6 @@ MongoClient.connect(
     var db = client.db("questions");
 
     app.get("/qa/:product_id", (req, res) => {
-      console.log(req.params);
-
       let returnObj = {};
       returnObj["product_id"] = req.params.product_id;
       db.collection("questions")
@@ -86,6 +84,134 @@ MongoClient.connect(
         })
         .catch(err => {
           console.log(err);
+        });
+    });
+    app.post("/qa/:product_id", (req, res) => {
+      db.collection("questions")
+        .count()
+        .then(count => {
+          db.collection("questions")
+            .insertOne({
+              id: count + 1,
+              product_id: Number(req.params.product_id),
+              body: req.body.body,
+              date_written: new Date(),
+              asker_name: req.body.name,
+              asker_email: req.body.email,
+              reported: 0,
+              helpful: 0
+            })
+            .then(data => {
+              res.sendStatus(201);
+            })
+            .catch(err => {
+              console.log(err);
+              res.sendStatus(500);
+            });
+        })
+        .catch(err => {
+          console.log("error: ", err);
+          res.sendStatus(500);
+        });
+    });
+    app.post("/qa/:question_id/answers", (req, res) => {
+      db.collection("answers")
+        .count()
+        .then(count => {
+          console.log("adding answer id #", count);
+          console.log("question_id: ", req.params.question_id);
+          db.collection("answers")
+            .insertOne({
+              id: count + 1,
+              question_id: Number(req.params.question_id),
+              body: req.body.body,
+              date_written: new Date(),
+              answerer_name: req.body.name,
+              answerer_email: req.body.email,
+              reported: 0,
+              helpful: 0
+            })
+            .then(data => {
+              let promises = [];
+              req.body.photos.forEach(photo => {
+                promises.push(
+                  db.collection("photos").insertOne({
+                    answer_id: count + 1,
+                    url: photo
+                  })
+                );
+              });
+              Promise.all(promises).then(res.sendStatus(201));
+            })
+            .catch(err => {
+              console.log(err);
+              res.sendStatus(500);
+            });
+        })
+        .catch(err => {
+          console.log("error: ", err);
+          res.sendStatus(500);
+        });
+    });
+    app.put("/qa/question/:question_id/helpful", (req, res) => {
+      console.log(req.params.question_id);
+      db.collection("questions")
+        .updateOne(
+          { id: Number(req.params.question_id) },
+          { $inc: { helpful: 1 } }
+        )
+        .then(data => {
+          // why does it not send this status??
+          res.sendStatus(204);
+        })
+        .catch(err => {
+          console.log(err);
+          res.sendStatus(500);
+        });
+    });
+    app.put("/qa/question/:question_id/report", (req, res) => {
+      console.log(req.params.question_id);
+      db.collection("questions")
+        .updateOne(
+          { id: Number(req.params.question_id) },
+          { $inc: { reported: 1 } }
+        )
+        .then(data => {
+          res.sendStatus(204);
+        })
+        .catch(err => {
+          console.log(err);
+          res.sendStatus(500);
+        });
+    });
+    app.put("/qa/answer/:answer_id/helpful", (req, res) => {
+      db.collection("answers")
+        .updateOne(
+          { id: Number(req.params.answer_id) },
+          { $inc: { helpful: 1 } }
+        )
+        .then(data => {
+          // why does it not send this status??
+          res.sendStatus(204);
+        })
+        .catch(err => {
+          console.log(err);
+          res.sendStatus(500);
+        });
+    });
+    app.put("/qa/answer/:answer_id/report", (req, res) => {
+      db.collection("answers")
+        .updateOne(
+          { id: Number(req.params.answer_id) },
+          { $inc: { reported: 1 } }
+        )
+        .then(data => {
+          // why does it not send this status??
+          res.sendStatus(204);
+        })
+        .catch(err => {
+          console.log(err);
+          res.sendStatus(500);
         });
     });
   }

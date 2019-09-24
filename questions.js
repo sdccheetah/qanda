@@ -3,7 +3,7 @@ const fs = require("fs");
 const readline = require("readline");
 const csv = require("csv-parser");
 
-mongoose.connect("mongodb://localhost:27017/questions", {
+mongoose.connect("mongodb://localhost:27017/questions2", {
   useNewUrlParser: true
 });
 
@@ -12,14 +12,14 @@ var db = mongoose.connection;
 var Schema = mongoose.Schema;
 
 var questionSchema = new Schema({
-  id: { type: Number, unique: true },
+  question_id: { type: Number, unique: true },
   product_id: { type: Number, index: true },
-  body: String,
-  date_written: Date,
+  question_body: String,
+  question_date: Date,
   asker_name: String,
   asker_email: String,
   reported: Number,
-  helpful: Number
+  question_helpfulness: Number
 });
 
 var Question = mongoose.model("Question", questionSchema);
@@ -34,17 +34,17 @@ db.once("open", function(callback) {
     .pipe(csv())
     .on("data", data => {
       results.push({
-        id: data.id,
+        question_id: data.id,
         product_id: data[" product_id"],
-        body: data[" body"],
-        date_written: data[" date_written"],
+        question_body: data[" body"],
+        question_date: data[" date_written"],
         asker_name: data[" asker_name"],
         asker_email: data[" asker_email"],
         reported: data[" reported"],
-        helpful: data[" helpful"]
+        question_helpfulness: data[" helpful"]
       });
       count++;
-      if (count === 1000) {
+      if (count === 10000) {
         Question.insertMany(results);
         count = 0;
         results = [];

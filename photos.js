@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 const fs = require("fs");
 const csv = require("csv-parser");
 
-mongoose.connect("mongodb://localhost:27017/questions", {
+mongoose.connect("mongodb://localhost:27017/questions2", {
   useNewUrlParser: true
 });
 
@@ -28,7 +28,7 @@ db.once("open", function(callback) {
     .pipe(csv())
     .on("data", data => {
       results.push({
-        id: data.id,
+        photo_id: data.id,
         answer_id: data[" answer_id"],
         url: data[" url"]
       });

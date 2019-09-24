@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 const fs = require("fs");
 const csv = require("csv-parser");
 
-mongoose.connect("mongodb://localhost:27017/questions", {
+mongoose.connect("mongodb://localhost:27017/questions2", {
   useNewUrlParser: true
 });
 
@@ -14,11 +14,11 @@ const answerSchema = new Schema({
   id: { type: Number, unique: true },
   question_id: { type: Number, index: true },
   body: String,
-  date_written: Date,
+  date: Date,
   answerer_name: String,
   answerer_email: String,
   reported: Number,
-  helpful: Number
+  helpfulness: Number
 });
 
 var Answer = mongoose.model("Answer", answerSchema);
@@ -36,14 +36,14 @@ db.once("open", function(callback) {
         id: data.id,
         question_id: data[" question_id"],
         body: data[" body"],
-        date_written: data[" date_written"],
+        date: data[" date_written"],
         answerer_name: data[" answerer_name"],
         answerer_email: data[" answerer_email"],
         reported: data[" reported"],
-        helpful: data[" helpful"]
+        helpfulness: data[" helpful"]
       });
       count++;
-      if (count === 100000) {
+      if (count === 10000) {
         Answer.insertMany(results);
         count = 0;
         results = [];
@@ -52,6 +52,7 @@ db.once("open", function(callback) {
       }
     })
     .on("end", () => {
+      if (results.length > 0) Answer.insertMany(results);
       console.log("end of data");
     });
 });
