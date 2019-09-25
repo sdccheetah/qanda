@@ -33,7 +33,6 @@ MongoClient.connect(
         .toArray()
         .then(questions => {
           returnObj["results"] = questions;
-          console.log(returnObj);
           let innerPromises;
           let promises = returnObj["results"].map(question => {
             let questionId = Number(question.question_id);
@@ -143,8 +142,10 @@ MongoClient.connect(
               question_helpfulness: 0
             },
             function(err, data) {
-              if (err) console.log(err);
-              else res.sendStatus(204);
+              if (err) {
+                console.log(err);
+                res.sendStatus(500);
+              } else res.sendStatus(201);
             }
           );
         })
@@ -167,19 +168,21 @@ MongoClient.connect(
               answerer_name: req.body.name,
               answerer_email: req.body.email,
               reported: 0,
-              helpful: 0
+              helpfulness: 0
             })
             .then(data => {
-              let promises = [];
-              req.body.photos.forEach(photo => {
-                promises.push(
-                  db.collection("photos").insertOne({
-                    answer_id: count + 1,
-                    url: photo
-                  })
-                );
-              });
-              Promise.all(promises).then(res.sendStatus(201));
+              if (req.body.photos) {
+                let promises = [];
+                req.body.photos.forEach(photo => {
+                  promises.push(
+                    db.collection("photos").insertOne({
+                      answer_id: count + 1,
+                      url: photo
+                    })
+                  );
+                });
+                Promise.all(promises).then(res.sendStatus(201));
+              } else res.sendStatus(201);
             })
             .catch(err => {
               console.log(err);
@@ -191,14 +194,14 @@ MongoClient.connect(
           res.sendStatus(500);
         });
     });
+
     app.put("/qa/question/:question_id/helpful", (req, res) => {
       db.collection("questions")
         .updateOne(
-          { id: Number(req.params.question_id) },
-          { $inc: { helpful: 1 } }
+          { question_id: Number(req.params.question_id) },
+          { $inc: { question_helpfulness: 1 } }
         )
         .then(data => {
-          // why does it not send this status??
           res.sendStatus(204);
         })
         .catch(err => {
@@ -206,10 +209,11 @@ MongoClient.connect(
           res.sendStatus(500);
         });
     });
+
     app.put("/qa/question/:question_id/report", (req, res) => {
       db.collection("questions")
         .updateOne(
-          { id: Number(req.params.question_id) },
+          { question_id: Number(req.params.question_id) },
           { $inc: { reported: 1 } }
         )
         .then(data => {
@@ -220,14 +224,14 @@ MongoClient.connect(
           res.sendStatus(500);
         });
     });
+
     app.put("/qa/answer/:answer_id/helpful", (req, res) => {
       db.collection("answers")
         .updateOne(
           { id: Number(req.params.answer_id) },
-          { $inc: { helpful: 1 } }
+          { $inc: { helpfulness: 1 } }
         )
         .then(data => {
-          // why does it not send this status??
           res.sendStatus(204);
         })
         .catch(err => {
@@ -235,6 +239,7 @@ MongoClient.connect(
           res.sendStatus(500);
         });
     });
+
     app.put("/qa/answer/:answer_id/report", (req, res) => {
       db.collection("answers")
         .updateOne(
@@ -242,7 +247,6 @@ MongoClient.connect(
           { $inc: { reported: 1 } }
         )
         .then(data => {
-          // why does it not send this status??
           res.sendStatus(204);
         })
         .catch(err => {
@@ -252,19 +256,5 @@ MongoClient.connect(
     });
   }
 );
-
-cleanUpData = obj => {
-  for (let i = 0; i < obj.results.length; i++) {
-    let question = obj.results[i];
-    if (question.reported === 1) obj.results.splice(i, 1);
-    else {
-      delete question["_id"];
-      delete question["__v"];
-      question["question_id"] = question["id"];
-      delete question["id"];
-    }
-  }
-  return obj;
-};
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
