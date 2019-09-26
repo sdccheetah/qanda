@@ -1,9 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const app = express();
-const port = 3000;
+var cors = require("cors");
+var app = express();
+const port = 8080;
 const model = require("./model.js");
-
+app.use(cors());
 app.use(bodyParser.json());
 
 const MongoClient = require("mongodb").MongoClient;
@@ -17,6 +18,7 @@ MongoClient.connect(
     const db = client.db("questions2");
 
     app.get("/qa/:product_id", (req, res) => {
+      console.log("get request to /qa/:product_id", req.params.product_id);
       let returnObj = {};
       returnObj["product_id"] = req.params.product_id;
       db.collection("questions")
@@ -80,6 +82,7 @@ MongoClient.connect(
     });
 
     app.get("/qa/:question_id/answers", (req, res) => {
+      console.log("GET req");
       let page = Number(req.query.page) || 0;
       let count = Number(req.query.count) || 5;
       let question_id = req.params.question_id;
@@ -127,6 +130,7 @@ MongoClient.connect(
     });
 
     app.post("/qa/:product_id", (req, res) => {
+      console.log("post req");
       db.collection("questions")
         .count()
         .then(count => {
@@ -156,6 +160,7 @@ MongoClient.connect(
     });
 
     app.post("/qa/:question_id/answers", (req, res) => {
+      console.log("post req");
       db.collection("answers")
         .count()
         .then(count => {
@@ -196,6 +201,7 @@ MongoClient.connect(
     });
 
     app.put("/qa/question/:question_id/helpful", (req, res) => {
+      console.log("PUT");
       db.collection("questions")
         .updateOne(
           { question_id: Number(req.params.question_id) },
@@ -211,6 +217,7 @@ MongoClient.connect(
     });
 
     app.put("/qa/question/:question_id/report", (req, res) => {
+      console.log("put report question");
       db.collection("questions")
         .updateOne(
           { question_id: Number(req.params.question_id) },
@@ -226,6 +233,7 @@ MongoClient.connect(
     });
 
     app.put("/qa/answer/:answer_id/helpful", (req, res) => {
+      console.log("helpful answer");
       db.collection("answers")
         .updateOne(
           { id: Number(req.params.answer_id) },
@@ -241,6 +249,7 @@ MongoClient.connect(
     });
 
     app.put("/qa/answer/:answer_id/report", (req, res) => {
+      console.log("report answer");
       db.collection("answers")
         .updateOne(
           { id: Number(req.params.answer_id) },
