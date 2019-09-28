@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 var cors = require("cors");
 var app = express();
-const port = 8080;
+const port = 8000;
 const model = require("./model.js");
 app.use(cors());
 app.use(bodyParser.json());
@@ -10,12 +10,12 @@ app.use(bodyParser.json());
 const MongoClient = require("mongodb").MongoClient;
 
 MongoClient.connect(
-  "mongodb://localhost:27017/questions2",
+  "mongodb://host.docker.internal:27017/questions",
   { useNewUrlParser: true, useUnifiedTopology: true },
   function(err, client) {
-    if (err) throw err;
+    if (err) console.log(err);
 
-    const db = client.db("questions2");
+    const db = client.db("questions");
 
     app.get("/qa/:product_id", (req, res) => {
       console.log("get request to /qa/:product_id", req.params.product_id);

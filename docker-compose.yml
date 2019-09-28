@@ -1,0 +1,21 @@
+# version: "3"
+# services:
+#   app:
+#     container_name: express-mongo
+#     restart: always
+#     build: ./
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - .:/app
+#     links:
+#       - mongo
+#   mongo:
+#     container_name: mongo
+#     image: mongo
+#     volumes:
+#       - type: bind
+#       source: /usr/local/var/mongodb
+#       target: /data/db
+#     ports:
+#       - "27017:27017"
