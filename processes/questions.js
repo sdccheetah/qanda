@@ -11,7 +11,7 @@ model.db.once("open", function(callback) {
   let count = 0;
   let insert = 0;
   var lineReader = fs
-    .createReadStream("../../questions.csv")
+    .createReadStream("https://krharneysdcdata.s3.amazonaws.com/questions.csv?AWSAccessKeyId=AKIAJFQAHBDUGFATIRNA&Expires=1569702970&Signature=lX4DpOYOzrxvOppILUBv6nnDlFA%3D")
     .pipe(csv())
     .on("data", data => {
       results.push({

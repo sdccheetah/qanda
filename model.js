@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 
-mongoose.connect("mongodb://host.docker.internal:27017/questions", {
+mongoose.connect("mongodb://localhost:27017/questions", {
   useNewUrlParser: true
 });
 
