@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 var cors = require("cors");
 var app = express();
-const port = process.env.MONGOPATH;
+const port = 8000;
 // const model = require("./model.js");
 app.use(cors());
 app.use(bodyParser.json());
@@ -45,7 +45,9 @@ const db = mongoose.connection;
 //     }
 //   }
 // );
-
+app.get("/loaderio-72f635de2821cb5057744413c4c55dc1/", (req, res) => {
+  res.sendFile("loader.io");
+})
 app.get("/qa/:product_id", (req, res) => {
   console.log("get request to /qa/:product_id", req.params.product_id);
   let returnObj = {};
