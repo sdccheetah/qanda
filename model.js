@@ -1,11 +1,10 @@
 var mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/questions", {
+mongoose.connect(`mongodb://mongo:27017/questions`, {
   useNewUrlParser: true
 });
 
 module.exports.db = mongoose.connection;
-
 var Schema = mongoose.Schema;
 
 var questionSchema = new Schema({
