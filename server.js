@@ -46,9 +46,15 @@ const db = mongoose.connection;
 //     }
 //   }
 // );
+<<<<<<< HEAD
 app.get("/loaderio-72f635de2821cb5057744413c4c55dc1/", (req, res) => {
   res.sendFile("loader.io");
 });
+=======
+app.get("/loaderio-183e128f3c4f1cd2493eb93498feae2a/", (req, res) => {
+  res.sendFile(__dirname+"/loaderio.txt");
+})
+>>>>>>> 1636dfa8303ba1073bcb06fcc8fda155dc9e4781
 app.get("/qa/:product_id", (req, res) => {
   console.log("get request to /qa/:product_id", req.params.product_id);
   let returnObj = {};
@@ -292,3 +298,7 @@ app.put("/qa/answer/:answer_id/report", (req, res) => {
       res.sendStatus(500);
     });
 });
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1636dfa8303ba1073bcb06fcc8fda155dc9e4781
