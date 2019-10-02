@@ -17,6 +17,7 @@ const connectToMongo = () => {
     })
     .then(data => {
       console.log("CONNECTED TO MONGO");
+      app.listen(port, () => console.log(`Example app listening on port ${port}!`));
     })
     .catch(err => {
       console.log("NOT CONNECTED... TRYING AGAIN IN 5 SEC");
@@ -47,7 +48,7 @@ const db = mongoose.connection;
 // );
 app.get("/loaderio-72f635de2821cb5057744413c4c55dc1/", (req, res) => {
   res.sendFile("loader.io");
-})
+});
 app.get("/qa/:product_id", (req, res) => {
   console.log("get request to /qa/:product_id", req.params.product_id);
   let returnObj = {};
@@ -291,5 +292,3 @@ app.put("/qa/answer/:answer_id/report", (req, res) => {
       res.sendStatus(500);
     });
 });
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
