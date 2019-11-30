@@ -1,23 +1,24 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-var cors = require("cors");
-var app = express();
+const cors = require("cors");
+const mongoose = require("mongoose");
+
 const port = 8000;
-// const model = require("./model.js");
+const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-
-var mongoose = require("mongoose");
 
 const connectToMongo = () => {
   let tries = 0;
   mongoose
-    .connect(`mongodb://mongo:27017/questions`, {
+    .connect(`mongodb://mongo:27017/questions2`, {
       useNewUrlParser: true
     })
     .then(data => {
       console.log("CONNECTED TO MONGO");
-      app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+      app.listen(port, () =>
+        console.log(`Example app listening on port ${port}!`)
+      );
     })
     .catch(err => {
       console.log("NOT CONNECTED... TRYING AGAIN IN 5 SEC");
@@ -46,15 +47,9 @@ const db = mongoose.connection;
 //     }
 //   }
 // );
-<<<<<<< HEAD
-app.get("/loaderio-72f635de2821cb5057744413c4c55dc1/", (req, res) => {
-  res.sendFile("loader.io");
-});
-=======
 app.get("/loaderio-183e128f3c4f1cd2493eb93498feae2a/", (req, res) => {
-  res.sendFile(__dirname+"/loaderio.txt");
-})
->>>>>>> 1636dfa8303ba1073bcb06fcc8fda155dc9e4781
+  res.sendFile(__dirname + "/loaderio.txt");
+});
 app.get("/qa/:product_id", (req, res) => {
   console.log("get request to /qa/:product_id", req.params.product_id);
   let returnObj = {};
@@ -298,7 +293,3 @@ app.put("/qa/answer/:answer_id/report", (req, res) => {
       res.sendStatus(500);
     });
 });
-<<<<<<< HEAD
-=======
-
->>>>>>> 1636dfa8303ba1073bcb06fcc8fda155dc9e4781
